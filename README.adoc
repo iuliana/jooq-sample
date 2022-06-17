@@ -1,0 +1,36 @@
+== jOOQ MariaDB Sample Project
+
+Sample project for reproducing issue in community jOOQ trial version.
+
+=== Prepare Database
+
+Change directory to `docker-build` and run the following command to create the container image:
+
+[source]
+----
+docker build -t prospring6-mariadb:1.1 .
+----
+
+Run the following to start the container:
+
+[source]
+----
+docker run --name local-mariadb -d -p 3306:3306 prospring6-mariadb:1.1
+----
+
+=== Reproduce the Issue
+
+* Access this URL: https://www.jooq.org/download/versions
+* Download jOOQ Free Trial / Java 17+ Distributions using this link : https://www.jooq.org/download/versions#
+* Installed the jars in my local .m2 using the maven-install.sh (link:maven.install.log[log]).
+* run the link:src/main/java/org/toys/util/GenerateJOOQClasses.java[GenerateJOOQClasses.java] -> expect the +
+`Exception while executing meta query: (conn=142) SELECT command denied to user 'prospring6'@'172.17.0.1' for table 'proc'` error and a lot of mysql references, although I am using MariaDB.
+
+* Or, in a terminal run `mvn jooq-codegen:generate` -> expect the same.
+
+* in link:pom.xml[pom.xml] comment line marked with `(1)` amd remove comment from line marked with `(2)` . Now both the link:src/main/java/org/toys/util/GenerateJOOQClasses.java[GenerateJOOQClasses.java] and
+`mvn jooq-codegen:generate` should run fine.
+
+== Conclusion
+
+The trial version has a problem, and incompatibility with JDK 17 might not be it.
